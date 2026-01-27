@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROI Calculator | Liquid Consulting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Familjen+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #00d9ff;
+      --primary-rgb: 0, 217, 255;
+      --primary-dark: #00a8c7;
+      --background: #0a0f1a;
+      --card: rgba(15, 23, 42, 0.8);
+      --card-solid: #0f172a;
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f1f5f9;
+      --text-muted: #64748b;
+      --green: #22c55e;
+      --red: #ef4444;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Background gradient */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(var(--primary-rgb), 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(var(--primary-rgb), 0.05) 0%, transparent 50%),
+        linear-gradient(180deg, var(--background) 0%, #0d1321 100%);
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-family: 'Familjen Grotesk', sans-serif;
+      font-weight: 700;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (min-width: 768px) {
+      .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .logo {
+      height: 56px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: 1rem;
+    }
+
+    .header-subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin-top: 0.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 0.5rem 1.5rem;
+      background: var(--primary);
+      color: var(--background);
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
+    }
+
+    /* Model Toggle */
+    .model-toggle {
+      display: flex;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .model-toggle-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .model-toggle-btn:hover {
+      color: var(--text);
+    }
+
+    .model-toggle-btn.active {
+      background: var(--primary);
+      color: var(--background);
+      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.4);
+    }
+
+    @media (max-width: 640px) {
+      .model-toggle {
+        width: 100%;
+      }
+
+      .model-toggle-btn {
+        flex: 1;
+        padding: 0.625rem 0.75rem;
+        font-size: 0.8125rem;
+      }
+    }
+
+    /* Grid Layout */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 1024px) {
+      .grid-layout {
+        grid-template-columns: 1fr 1.4fr 1.2fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .card-accent {
+      border-left: 4px solid var(--primary);
+    }
+
+    .card-accent-subtle {
+      border-left: 4px solid rgba(var(--primary-rgb), 0.5);
+    }
+
+    .card-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-description {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    .card-content {
+      padding: 1.5rem;
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+    }
+
+    .form-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(var(--primary-rgb), 0.1);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(var(--primary-rgb), 0.2);
+    }
+
+    /* Custom Range Slider */
+    .slider-container {
+      position: relative;
+      padding: 0.5rem 0;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.6);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.8);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.6);
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* Select Dropdown */
+    .select-wrapper {
+      position: relative;
+    }
+
+    select {
+      width: 100%;
+      padding: 0.625rem 2.5rem 0.625rem 0.75rem;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.875rem;
+      cursor: pointer;
+      appearance: none;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+    }
+
+    .select-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Toggle Switch */
+    .toggle-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .toggle-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .toggle-label {
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .toggle-label .bonus {
+      color: var(--primary);
+      font-size: 0.75rem;
+      margin-left: 0.25rem;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      transition: background 0.3s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--primary);
+      box-shadow: 0 0 12px rgba(var(--primary-rgb), 0.5);
+    }
+
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(20px);
+    }
+
+    /* Separator */
+    .separator {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 0;
+    }
+
+    /* Metric Display */
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 0.75rem;
+    }
+
+    .metric-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .metric-row.highlight {
+      background: rgba(var(--primary-rgb), 0.1);
+      border-color: rgba(var(--primary-rgb), 0.3);
+      box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.1);
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+    }
+
+    .metric-row.highlight .metric-label {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .metric-row.highlight .metric-value {
+      color: var(--primary);
+      text-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5);
+      font-size: 1.5rem;
+    }
+
+    /* Mini Stats */
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+
+    .mini-stat {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+    }
+
+    .mini-stat-label {
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .mini-stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+
+    /* Section Title */
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Positive Rate Badge */
+    .rate-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .rate-badge.good {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--green);
+    }
+
+    .rate-badge.warning {
+      background: rgba(234, 179, 8, 0.2);
+      color: #eab308;
+    }
+
+    /* Results Box */
+    .results-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
+
+    .results-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .results-row:last-child {
+      border-bottom: none;
+    }
+
+    .results-cell {
+      text-align: center;
+    }
+
+    .results-cell-label {
+      font-size: 0.625rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .results-cell-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+
+    .results-cell-value.green {
+      color: var(--green);
+    }
+
+    /* ROI Cards */
+    .roi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .roi-card {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .roi-card-label {
+      font-size: 0.625rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .roi-card-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+
+    .roi-card-hint {
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      opacity: 0.6;
+      margin-top: 0.25rem;
+    }
+
+    /* Big ROI Box */
+    .roi-highlight {
+      background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.2) 0%, transparent 100%);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      border: 1px solid rgba(var(--primary-rgb), 0.2);
+    }
+
+    .roi-highlight-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .roi-highlight-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+    }
+
+    .roi-highlight-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-shadow: 0 0 20px rgba(var(--primary-rgb), 0.5);
+    }
+
+    .roi-highlight-desc {
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .roi-highlight-desc span {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Input Fields */
+    .input-field {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .input-group label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .input-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* LTV Preview */
+    .ltv-preview {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 0.75rem;
+    }
+
+    .ltv-preview-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .ltv-preview-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    /* Projection Section */
+    .projection-section {
+      margin-top: 2rem;
+    }
+
+    .projection-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .projection-title {
+      font-size: 1.5rem;
+    }
+
+    .projection-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .projection-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .projection-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .projection-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .projection-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius);
+      padding: 1rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .projection-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .projection-card-title {
+      font-size: 1rem;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .projection-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .projection-stat:last-child {
+      margin-bottom: 0;
+    }
+
+    .projection-stat-label {
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .projection-stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+
+    .projection-stat-value.revenue {
+      color: var(--green);
+    }
+
+    .projection-separator {
+      height: 1px;
+      background: var(--border);
+      margin: 0.5rem 0;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      padding: 3rem 0 2rem;
+    }
+
+    /* Icons (inline SVG) */
+    .icon {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* Custom slider for reply rate */
+    #customReplyRateContainer {
+      display: none;
+      margin-top: 0.75rem;
+    }
+
+    #customReplyRateContainer.visible {
+      display: block;
+    }
+
+    /* Setup fee container */
+    #setupFeeContainer {
+      display: none;
+    }
+
+    #setupFeeContainer.visible {
+      display: block;
+    }
+
+    /* Retention container */
+    #retentionContainer {
+      display: block;
+    }
+
+    #retentionContainer.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div>
+<img src="logo.png" alt="Liquid Consulting" class="logo">
+        <h1 class="header-title" id="headerTitle">21-Day Pilot ROI Calculator</h1>
+        <p class="header-subtitle" id="headerSubtitle">Project your growth with Liquid Consulting's 21-Day Pilot</p>
+      </div>
+      <div class="model-toggle">
+        <button class="model-toggle-btn active" id="pilotModeBtn" data-mode="pilot">21-Day Pilot</button>
+        <button class="model-toggle-btn" id="performanceModeBtn" data-mode="performance">Retainer</button>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="grid-layout">
+
+      <!-- Column 1: Campaign Inputs -->
+      <div class="card card-accent-subtle">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg class="icon"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            Campaign Inputs
+          </h2>
+          <p class="card-description">Configure your outreach volume and variables</p>
+        </div>
+        <div class="card-content">
+
+          <!-- Emails Per Day -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Emails Per Day</span>
+              <span class="form-value" id="emailsPerDayValue">2,000</span>
+            </div>
+            <div class="slider-container">
+              <input type="range" id="emailsPerDay" min="500" max="10000" step="100" value="2000">
+            </div>
+            <p class="form-hint" id="emailsHint">*Calculated based on ~15 weekdays in 21-day pilot</p>
+          </div>
+
+          <div class="separator"></div>
+
+          <!-- Reply Rate -->
+          <div class="form-group">
+            <label class="form-label">Reply Rate</label>
+            <div class="select-wrapper">
+              <select id="replyRateType">
+                <option value="avg">Our Client Average (3.41%)</option>
+                <option value="over">Overperforming (5.0%)</option>
+                <option value="under">Underperforming (1.2%)</option>
+                <option value="custom">Custom Rate</option>
+              </select>
+            </div>
+            <div id="customReplyRateContainer">
+              <div class="form-label" style="margin-top: 0.75rem;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Custom Rate</span>
+                <span class="form-value" id="customReplyRateValue" style="font-size: 0.75rem;">3.41%</span>
+              </div>
+              <input type="range" id="customReplyRate" min="0.1" max="10" step="0.1" value="3.41">
+            </div>
+          </div>
+
+          <div class="separator"></div>
+
+          <!-- Offer Variables -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Offer Variables</span>
+              <span class="rate-badge warning" id="positiveRateBadge">7.5% Positive Rate</span>
+            </div>
+            <p class="form-hint" style="margin-bottom: 1rem;">Select all that apply to your offer:</p>
+
+            <div class="toggle-group">
+              <div class="toggle-item">
+                <label class="toggle-label" for="pmf">Strong product-market fit <span class="bonus">(+7.5%)</span></label>
+                <label class="toggle">
+                  <input type="checkbox" id="pmf" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-item">
+                <label class="toggle-label" for="claims">Specific/measurable claims <span class="bonus">(+15%)</span></label>
+                <label class="toggle">
+                  <input type="checkbox" id="claims" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-item">
+                <label class="toggle-label" for="guarantee">Guarantee or risk reversal <span class="bonus">(+10%)</span></label>
+                <label class="toggle">
+                  <input type="checkbox" id="guarantee">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-item">
+                <label class="toggle-label" for="social">Very good social presence <span class="bonus">(+7.5%)</span></label>
+                <label class="toggle">
+                  <input type="checkbox" id="social">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-item">
+                <label class="toggle-label" for="cases">Case studies available <span class="bonus">(+7.5%)</span></label>
+                <label class="toggle">
+                  <input type="checkbox" id="cases">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-item">
+                <label class="toggle-label" for="magnet">High-value Lead Magnet <span class="bonus">(+20%)</span></label>
+                <label class="toggle">
+                  <input type="checkbox" id="magnet">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Column 2: Projected Results -->
+      <div class="card card-accent">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg class="icon"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="m2 10 20 0"/></svg>
+            Projected Results
+          </h2>
+          <p class="card-description" id="projectedResultsDesc">21-Day Pilot volume based on 15 weekdays</p>
+        </div>
+        <div class="card-content">
+
+          <!-- Top Metrics -->
+          <div style="margin-bottom: 1rem;">
+            <div class="metric-row">
+              <span class="metric-label" id="emailsSentLabel">Emails Sent (21 Days)</span>
+              <span class="metric-value font-mono" id="monthlyEmailsSent">30,000</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">People Contacted</span>
+              <span class="metric-value font-mono" id="peopleContacted">15,000</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label" id="repliesLabel">Total Replies (21 Days)</span>
+              <span class="metric-value font-mono" id="totalMonthlyReplies">512</span>
+            </div>
+            <div class="metric-row highlight">
+              <span class="metric-label" id="interestedLabel">Interested Leads (21 Days)</span>
+              <span class="metric-value font-mono" id="monthlyInterestedLeads">38</span>
+            </div>
+          </div>
+
+          <!-- Mini Projections (Performance Mode Only) -->
+          <div class="mini-stats" id="miniStatsSection" style="display: none;">
+            <div class="mini-stat">
+              <div class="mini-stat-label">3 Months</div>
+              <div class="mini-stat-value font-mono" id="leads3mo">162</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-label">6 Months</div>
+              <div class="mini-stat-value font-mono" id="leads6mo">324</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-label">12 Months</div>
+              <div class="mini-stat-value font-mono" id="leads12mo">648</div>
+            </div>
+          </div>
+
+          <div class="separator"></div>
+
+          <!-- Funnel Performance -->
+          <div class="section-title">
+            <svg class="icon" style="width: 16px; height: 16px;"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            Funnel Performance
+          </div>
+
+          <!-- Call Booking % -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Call Booking Percentage</span>
+              <span class="form-value" id="callBookingRateValue">30%</span>
+            </div>
+            <input type="range" id="callBookingRate" min="1" max="100" step="1" value="30">
+            <p class="form-hint">% of positive replies that book a call (Default: 35%)</p>
+          </div>
+
+          <!-- Show Rate % -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Show Rate Percentage</span>
+              <span class="form-value" id="showRateValue">70%</span>
+            </div>
+            <input type="range" id="showRate" min="1" max="100" step="1" value="70">
+            <p class="form-hint">% of booked calls that show up (Default: 80%)</p>
+          </div>
+
+          <!-- Close Rate % -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Close Rate Percentage</span>
+              <span class="form-value" id="closeRateValue">17%</span>
+            </div>
+            <input type="range" id="closeRate" min="1" max="100" step="1" value="17">
+            <p class="form-hint">% of showed up calls that close (Default: 17%)</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Column 3: Business Economics & ROI -->
+      <div class="card card-accent-subtle">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg class="icon"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Business Economics & ROI
+          </h2>
+          <p class="card-description">Calculate your return on investment</p>
+        </div>
+        <div class="card-content">
+
+          <!-- Business Economics -->
+          <div class="results-box" style="padding: 1rem; margin-bottom: 1.5rem;">
+
+            <div class="input-group" style="margin-bottom: 0.75rem;">
+              <label>Billing Frequency</label>
+              <div class="select-wrapper">
+                <select id="billingFreq">
+                  <option value="yearly" selected>Yearly Contract</option>
+                  <option value="monthly">Monthly Recurring</option>
+                  <option value="quarterly">Quarterly</option>
+                  <option value="onetime">One-time Payment</option>
+                  <option value="setup_upsell">Setup Fee + Retainer Upsell</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Standard billing fields -->
+            <div class="input-grid" id="standardBillingFields">
+              <div class="input-group">
+                <label id="dealSizeLabel">Avg Deal Size ($)</label>
+                <input type="number" class="input-field" id="dealSize" value="10000">
+              </div>
+              <div class="input-group" id="retentionContainer">
+                <label>Average Client Retention (Months)</label>
+                <input type="number" class="input-field" id="retentionMonths" value="12">
+              </div>
+            </div>
+
+            <!-- Setup + Retainer Upsell fields -->
+            <div id="upsellBillingFields" style="display: none;">
+              <div class="input-grid">
+                <div class="input-group">
+                  <label>Setup Fee ($)</label>
+                  <input type="number" class="input-field" id="setupFee" value="3500">
+                </div>
+                <div class="input-group">
+                  <label>Monthly Retainer ($)</label>
+                  <input type="number" class="input-field" id="retainerAmount" value="5000">
+                </div>
+              </div>
+              <div class="input-grid" style="margin-top: 0.75rem;">
+                <div class="input-group">
+                  <label>% Who Convert to Retainer</label>
+                  <input type="number" class="input-field" id="upsellRate" value="50" min="0" max="100">
+                </div>
+                <div class="input-group">
+                  <label>Avg Retainer Length (Months)</label>
+                  <input type="number" class="input-field" id="upsellRetainerMonths" value="6">
+                </div>
+              </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 0.75rem;">
+              <label>Average Sales Cycle Length</label>
+              <div class="select-wrapper">
+                <select id="salesCycle">
+                  <option value="7">7 Days</option>
+                  <option value="14" selected>14 Days</option>
+                  <option value="30">30 Days</option>
+                  <option value="60">60 Days</option>
+                  <option value="90">90 Days</option>
+                  <option value="180">180 Days</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="ltv-preview">
+              <span class="ltv-preview-label">Calculated LTV:</span>
+              <span class="ltv-preview-value font-mono" id="calculatedLtv">$20,000</span>
+            </div>
+          </div>
+
+          <div class="separator"></div>
+
+          <!-- Results Table -->
+          <div class="results-box">
+            <div class="results-row">
+              <div class="results-cell">
+                <div class="results-cell-label">Booked</div>
+                <div class="results-cell-value font-mono" id="monthlyMeetings">16</div>
+              </div>
+              <div class="results-cell">
+                <div class="results-cell-label">Showed</div>
+                <div class="results-cell-value font-mono" id="monthlyShowedUp">11</div>
+              </div>
+              <div class="results-cell">
+                <div class="results-cell-label">Closed</div>
+                <div class="results-cell-value font-mono" id="monthlyDeals">2</div>
+              </div>
+            </div>
+            <div class="results-row" style="grid-template-columns: repeat(2, 1fr);">
+              <div class="results-cell">
+                <div class="results-cell-label">CAC</div>
+                <div class="results-cell-value font-mono" id="cac">$2,750</div>
+              </div>
+              <div class="results-cell">
+                <div class="results-cell-label">LTV Added</div>
+                <div class="results-cell-value font-mono green" id="ltvAdded">$40,000</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="separator"></div>
+
+          <!-- ROI Metrics -->
+          <div class="roi-grid" style="margin-bottom: 1rem;">
+            <div class="roi-card">
+              <div class="roi-card-label" id="cashPeriodLabel">21-Day Cash</div>
+              <div class="roi-card-value font-mono" id="cash30Day" style="color: var(--green);">$40,000</div>
+              <div class="roi-card-hint" id="cash30DayHint">Based on cycle</div>
+            </div>
+            <div class="roi-card">
+              <div class="roi-card-label" id="roiPeriodLabel">21-Day ROI</div>
+              <div class="roi-card-value font-mono" id="roi30DayX" style="color: var(--green);">7.27x</div>
+              <div class="roi-card-hint">Initial Return</div>
+            </div>
+          </div>
+
+          <!-- Investment Display -->
+          <div class="roi-card" style="margin-bottom: 1rem; background: rgba(var(--primary-rgb), 0.1); border-color: rgba(var(--primary-rgb), 0.2);">
+            <div class="roi-card-label">Your Investment</div>
+            <div class="roi-card-value font-mono" id="investmentDisplay" style="color: var(--primary);">$3,500</div>
+            <div class="roi-card-hint" id="investmentHint">21-Day Pilot (one-time)</div>
+          </div>
+
+          <!-- Main ROI Highlight -->
+          <div class="roi-highlight">
+            <div class="roi-highlight-header">
+              <span class="roi-highlight-title" id="mainRoiTitle">21-Day Pilot ROI</span>
+              <span class="roi-highlight-value" id="roi12Mo">7.3x</span>
+            </div>
+            <p class="roi-highlight-desc">
+              For every <span>$1</span> invested, you get <span id="roiPerDollar">$7.27</span> back
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 12-Month Projection (Performance Mode Only) -->
+    <div class="projection-section" id="projectionSection" style="display: none;">
+      <div class="projection-header">
+        <svg class="icon" style="color: var(--primary);"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        <h2 class="projection-title">12-Month Growth Trajectory (Cumulative)</h2>
+      </div>
+      <div class="projection-grid" id="projectionGrid">
+        <!-- Cards will be generated by JS -->
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      &copy; <span id="currentYear">2026</span> Liquid Consulting. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    // ============================================
+    // ROI Calculator Logic
+    // ============================================
+
+    // DOM Elements
+    const elements = {
+      // Mode Toggle
+      pilotModeBtn: document.getElementById('pilotModeBtn'),
+      performanceModeBtn: document.getElementById('performanceModeBtn'),
+      headerTitle: document.getElementById('headerTitle'),
+      headerSubtitle: document.getElementById('headerSubtitle'),
+
+      // Inputs
+      emailsPerDay: document.getElementById('emailsPerDay'),
+      replyRateType: document.getElementById('replyRateType'),
+      customReplyRate: document.getElementById('customReplyRate'),
+      customReplyRateContainer: document.getElementById('customReplyRateContainer'),
+      pmf: document.getElementById('pmf'),
+      claims: document.getElementById('claims'),
+      guarantee: document.getElementById('guarantee'),
+      social: document.getElementById('social'),
+      cases: document.getElementById('cases'),
+      magnet: document.getElementById('magnet'),
+      callBookingRate: document.getElementById('callBookingRate'),
+      showRate: document.getElementById('showRate'),
+      closeRate: document.getElementById('closeRate'),
+      billingFreq: document.getElementById('billingFreq'),
+      dealSize: document.getElementById('dealSize'),
+      setupFee: document.getElementById('setupFee'),
+      setupFeeContainer: document.getElementById('setupFeeContainer'),
+      retentionMonths: document.getElementById('retentionMonths'),
+      retentionContainer: document.getElementById('retentionContainer'),
+      salesCycle: document.getElementById('salesCycle'),
+      // Setup + Retainer Upsell fields
+      upsellBillingFields: document.getElementById('upsellBillingFields'),
+      standardBillingFields: document.getElementById('standardBillingFields'),
+      retainerAmount: document.getElementById('retainerAmount'),
+      upsellRate: document.getElementById('upsellRate'),
+      upsellRetainerMonths: document.getElementById('upsellRetainerMonths'),
+
+      // Display Values
+      emailsPerDayValue: document.getElementById('emailsPerDayValue'),
+      customReplyRateValue: document.getElementById('customReplyRateValue'),
+      positiveRateBadge: document.getElementById('positiveRateBadge'),
+      callBookingRateValue: document.getElementById('callBookingRateValue'),
+      showRateValue: document.getElementById('showRateValue'),
+      closeRateValue: document.getElementById('closeRateValue'),
+      emailsHint: document.getElementById('emailsHint'),
+      projectedResultsDesc: document.getElementById('projectedResultsDesc'),
+
+      // Dynamic Labels
+      emailsSentLabel: document.getElementById('emailsSentLabel'),
+      repliesLabel: document.getElementById('repliesLabel'),
+      interestedLabel: document.getElementById('interestedLabel'),
+      cashPeriodLabel: document.getElementById('cashPeriodLabel'),
+      roiPeriodLabel: document.getElementById('roiPeriodLabel'),
+      mainRoiTitle: document.getElementById('mainRoiTitle'),
+      investmentDisplay: document.getElementById('investmentDisplay'),
+      investmentHint: document.getElementById('investmentHint'),
+
+      // Sections
+      miniStatsSection: document.getElementById('miniStatsSection'),
+      projectionSection: document.getElementById('projectionSection'),
+
+      // Results
+      monthlyEmailsSent: document.getElementById('monthlyEmailsSent'),
+      peopleContacted: document.getElementById('peopleContacted'),
+      totalMonthlyReplies: document.getElementById('totalMonthlyReplies'),
+      monthlyInterestedLeads: document.getElementById('monthlyInterestedLeads'),
+      leads3mo: document.getElementById('leads3mo'),
+      leads6mo: document.getElementById('leads6mo'),
+      leads12mo: document.getElementById('leads12mo'),
+      monthlyMeetings: document.getElementById('monthlyMeetings'),
+      monthlyShowedUp: document.getElementById('monthlyShowedUp'),
+      monthlyDeals: document.getElementById('monthlyDeals'),
+      calculatedLtv: document.getElementById('calculatedLtv'),
+      cac: document.getElementById('cac'),
+      ltvAdded: document.getElementById('ltvAdded'),
+      cash30Day: document.getElementById('cash30Day'),
+      cash30DayHint: document.getElementById('cash30DayHint'),
+      roi30DayX: document.getElementById('roi30DayX'),
+      roi12Mo: document.getElementById('roi12Mo'),
+      roiPerDollar: document.getElementById('roiPerDollar'),
+      projectionGrid: document.getElementById('projectionGrid'),
+      currentYear: document.getElementById('currentYear')
+    };
+
+    // Formatters
+    const fmtNum = (n) => new Intl.NumberFormat('en-US').format(Math.round(n));
+    const fmtCurrency = (n) => new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(n);
+
+    // Constants
+    const WEEKDAYS_MONTH = 21;
+    const WEEKDAYS_PILOT = 15; // ~15 weekdays in 21 calendar days
+    const RETAINER_FEE = 5000; // $5,000/month flat retainer
+    const PILOT_FEE = 3500;
+
+    // Current mode
+    let currentMode = 'pilot'; // 'pilot' or 'performance'
+
+    // Update UI based on mode
+    function updateModeUI() {
+      const isPilot = currentMode === 'pilot';
+
+      // Toggle buttons
+      elements.pilotModeBtn.classList.toggle('active', isPilot);
+      elements.performanceModeBtn.classList.toggle('active', !isPilot);
+
+      // Header
+      elements.headerTitle.textContent = isPilot ? '21-Day Pilot ROI Calculator' : 'Retainer ROI Calculator';
+      elements.headerSubtitle.textContent = isPilot
+        ? "Project your growth with Liquid Consulting's 21-Day Pilot"
+        : "Project your growth with Liquid Consulting's Monthly Retainer";
+
+      // Labels
+      const periodLabel = isPilot ? '21 Days' : 'Monthly';
+      elements.emailsSentLabel.textContent = `Emails Sent (${periodLabel})`;
+      elements.repliesLabel.textContent = `Total Replies (${periodLabel})`;
+      elements.interestedLabel.textContent = `Interested Leads (${periodLabel})`;
+      elements.cashPeriodLabel.textContent = '30-Day Cash';
+      elements.roiPeriodLabel.textContent = '30-Day ROI';
+      elements.mainRoiTitle.textContent = isPilot ? '90-Day ROI' : '12-Month ROI';
+
+      // Hints
+      elements.emailsHint.textContent = isPilot
+        ? '*Calculated based on ~15 weekdays in 21-day pilot'
+        : '*Calculated based on ~21 weekdays/month';
+      elements.projectedResultsDesc.textContent = isPilot
+        ? '21-Day Pilot volume based on 15 weekdays'
+        : 'Monthly volume based on 21 weekdays';
+
+      // Investment display
+      elements.investmentDisplay.textContent = isPilot ? '$3,500' : '$5,000';
+      elements.investmentHint.textContent = isPilot ? '21-Day Pilot (one-time)' : 'Monthly Retainer';
+
+      // Show/hide sections
+      elements.miniStatsSection.style.display = isPilot ? 'none' : 'grid';
+      elements.projectionSection.style.display = isPilot ? 'none' : 'block';
+    }
+
+    // Calculate everything
+    function calculate() {
+      const isPilot = currentMode === 'pilot';
+      const weekdays = isPilot ? WEEKDAYS_PILOT : WEEKDAYS_MONTH;
+
+      // 1. Get input values
+      const dailyEmails = parseInt(elements.emailsPerDay.value);
+      const periodEmailsSent = dailyEmails * weekdays;
+
+      // Reply Rate
+      let activeReplyRate = 3.41;
+      const replyRateType = elements.replyRateType.value;
+      if (replyRateType === 'over') activeReplyRate = 5.0;
+      else if (replyRateType === 'under') activeReplyRate = 1.2;
+      else if (replyRateType === 'custom') activeReplyRate = parseFloat(elements.customReplyRate.value);
+
+      // Positive Response Rate
+      let positiveResponseRate = 0;
+      if (elements.pmf.checked) positiveResponseRate += 7.5;
+      if (elements.claims.checked) positiveResponseRate += 15;
+      if (elements.guarantee.checked) positiveResponseRate += 10;
+      if (elements.social.checked) positiveResponseRate += 7.5;
+      if (elements.cases.checked) positiveResponseRate += 7.5;
+      if (elements.magnet.checked) positiveResponseRate += 20;
+
+      // 2. Projected Results
+      const peopleContacted = periodEmailsSent / 2;
+      const totalReplies = Math.round(peopleContacted * (activeReplyRate / 100));
+      const interestedLeads = Math.round(totalReplies * (positiveResponseRate / 100));
+
+      // 3. Funnel
+      const callBookingRate = parseInt(elements.callBookingRate.value);
+      const showRate = parseInt(elements.showRate.value);
+      const closeRate = parseInt(elements.closeRate.value);
+
+      const meetingsBooked = Math.round(interestedLeads * (callBookingRate / 100));
+      const showedUp = Math.round(meetingsBooked * (showRate / 100));
+      const dealsClosed = Math.round(showedUp * (closeRate / 100));
+
+      // 4. Business Economics
+      const billingFreq = elements.billingFreq.value;
+      const dealSize = parseFloat(elements.dealSize.value) || 0;
+      const setupFee = parseFloat(elements.setupFee.value) || 0;
+      const retentionMonths = parseInt(elements.retentionMonths.value) || 12;
+      const salesCycle = parseInt(elements.salesCycle.value);
+      // Setup + Retainer Upsell fields
+      const retainerAmount = parseFloat(elements.retainerAmount.value) || 0;
+      const upsellRate = parseFloat(elements.upsellRate.value) || 0;
+      const upsellRetainerMonths = parseFloat(elements.upsellRetainerMonths.value) || 6;
+
+      // LTV Calculation
+      let calculatedLtv = 0;
+      if (billingFreq === 'onetime') {
+        calculatedLtv = dealSize;
+      } else if (billingFreq === 'monthly') {
+        calculatedLtv = dealSize * retentionMonths;
+      } else if (billingFreq === 'quarterly') {
+        calculatedLtv = dealSize * (retentionMonths / 3);
+      } else if (billingFreq === 'yearly') {
+        calculatedLtv = dealSize * (retentionMonths / 12);
+      } else if (billingFreq === 'setup_monthly') {
+        calculatedLtv = setupFee + (dealSize * retentionMonths);
+      } else if (billingFreq === 'setup_upsell') {
+        // Setup Fee + (% who convert × monthly retainer × avg retainer length)
+        calculatedLtv = setupFee + ((upsellRate / 100) * retainerAmount * upsellRetainerMonths);
+      }
+
+      // Calculate costs and ROI based on mode
+      let periodCost, periodCash, periodRoi, periodRoiX, mainRoi;
+
+      if (isPilot) {
+        // 21-Day Pilot: Fixed $3,500 cost
+        periodCost = PILOT_FEE;
+
+        // Cash in 30 days (standard metric)
+        const dealsInPeriod = salesCycle <= 30 ? dealsClosed : 0;
+        let firstPayment = dealSize;
+        if (billingFreq === 'setup_monthly') {
+          firstPayment = setupFee + dealSize;
+        } else if (billingFreq === 'setup_upsell') {
+          // For setup_upsell: Everyone pays setup fee, upsell % pay first retainer month
+          firstPayment = setupFee + ((upsellRate / 100) * retainerAmount);
+        }
+        periodCash = dealsInPeriod * firstPayment;
+
+        // 90-Day Value calculation (for main ROI display)
+        let value90Days = 0;
+        if (dealsInPeriod > 0) {
+          if (billingFreq === 'onetime') {
+            value90Days = dealsInPeriod * dealSize;
+          } else if (billingFreq === 'monthly') {
+            value90Days = dealsInPeriod * dealSize * 3; // 3 months of payments
+          } else if (billingFreq === 'quarterly') {
+            value90Days = dealsInPeriod * dealSize; // 1 quarterly payment
+          } else if (billingFreq === 'yearly') {
+            value90Days = dealsInPeriod * dealSize; // 1 yearly payment
+          } else if (billingFreq === 'setup_monthly') {
+            value90Days = dealsInPeriod * (setupFee + (dealSize * 3)); // Setup + 3 months
+          } else if (billingFreq === 'setup_upsell') {
+            // Setup fee from all deals + (upsell % × 3 months of retainer)
+            value90Days = dealsInPeriod * (setupFee + ((upsellRate / 100) * retainerAmount * 3));
+          }
+        }
+
+        // ROI for 21-day cash
+        periodRoiX = periodCost > 0 ? (periodCash / periodCost).toFixed(2) : '0.00';
+        // 90-Day ROI
+        mainRoi = periodCost > 0 ? (value90Days / periodCost) : 0;
+
+        elements.cash30DayHint.textContent = salesCycle > 30 ? '0 deals (Cycle > 30d)' : 'Based on cycle';
+        elements.investmentDisplay.textContent = fmtCurrency(PILOT_FEE);
+
+      } else {
+        // Retainer: $5,000/month flat fee
+        periodCost = RETAINER_FEE;
+
+        // 30-day cash
+        const dealsIn30Days = salesCycle <= 30 ? dealsClosed : 0;
+        let firstPayment = dealSize;
+        if (billingFreq === 'setup_monthly') {
+          firstPayment = setupFee + dealSize;
+        } else if (billingFreq === 'setup_upsell') {
+          firstPayment = setupFee + ((upsellRate / 100) * retainerAmount);
+        }
+        periodCash = dealsIn30Days * firstPayment;
+
+        // 12-Month Value
+        let valuePerClient12Mo = dealSize;
+        if (billingFreq === 'monthly') valuePerClient12Mo = dealSize * Math.min(retentionMonths, 12);
+        if (billingFreq === 'quarterly') valuePerClient12Mo = dealSize * Math.min(Math.floor(retentionMonths / 3), 4);
+        if (billingFreq === 'yearly') valuePerClient12Mo = dealSize;
+        if (billingFreq === 'onetime') valuePerClient12Mo = dealSize;
+        if (billingFreq === 'setup_monthly') valuePerClient12Mo = setupFee + (dealSize * Math.min(retentionMonths, 12));
+        if (billingFreq === 'setup_upsell') {
+          // Setup fee + (upsell % × retainer amount × min(retainer months, 12))
+          valuePerClient12Mo = setupFee + ((upsellRate / 100) * retainerAmount * Math.min(upsellRetainerMonths, 12));
+        }
+
+        const totalRevenue12Mo = dealsClosed * valuePerClient12Mo;
+        mainRoi = periodCost > 0 ? ((totalRevenue12Mo - periodCost) / periodCost) + 1 : 0;
+        periodRoiX = periodCost > 0 ? (periodCash / periodCost).toFixed(2) : '0.00';
+
+        elements.cash30DayHint.textContent = salesCycle > 30 ? '0 deals (Cycle > 30d)' : 'Based on cycle';
+        elements.investmentDisplay.textContent = fmtCurrency(RETAINER_FEE) + '/mo';
+      }
+
+      const cac = dealsClosed > 0 ? Math.round(periodCost / dealsClosed) : 0;
+      const ltvAdded = dealsClosed * calculatedLtv;
+
+      // 5. Update UI
+      elements.emailsPerDayValue.textContent = fmtNum(dailyEmails);
+      elements.customReplyRateValue.textContent = parseFloat(elements.customReplyRate.value).toFixed(1) + '%';
+
+      elements.positiveRateBadge.textContent = positiveResponseRate + '% Positive Rate';
+      elements.positiveRateBadge.className = positiveResponseRate > 15 ? 'rate-badge good' : 'rate-badge warning';
+
+      elements.callBookingRateValue.textContent = callBookingRate + '%';
+      elements.showRateValue.textContent = showRate + '%';
+      elements.closeRateValue.textContent = closeRate + '%';
+
+      elements.monthlyEmailsSent.textContent = fmtNum(periodEmailsSent);
+      elements.peopleContacted.textContent = fmtNum(peopleContacted);
+      elements.totalMonthlyReplies.textContent = fmtNum(totalReplies);
+      elements.monthlyInterestedLeads.textContent = fmtNum(interestedLeads);
+
+      elements.leads3mo.textContent = fmtNum(interestedLeads * 3);
+      elements.leads6mo.textContent = fmtNum(interestedLeads * 6);
+      elements.leads12mo.textContent = fmtNum(interestedLeads * 12);
+
+      elements.monthlyMeetings.textContent = fmtNum(meetingsBooked);
+      elements.monthlyShowedUp.textContent = fmtNum(showedUp);
+      elements.monthlyDeals.textContent = fmtNum(dealsClosed);
+
+      elements.calculatedLtv.textContent = fmtCurrency(calculatedLtv);
+      elements.cac.textContent = fmtCurrency(cac);
+      elements.ltvAdded.textContent = fmtCurrency(ltvAdded);
+
+      elements.cash30Day.textContent = fmtCurrency(periodCash);
+      elements.cash30Day.style.color = periodCash > 0 ? 'var(--green)' : 'var(--text-muted)';
+
+      elements.roi30DayX.textContent = periodRoiX + 'x';
+      elements.roi30DayX.style.color = parseFloat(periodRoiX) >= 1 ? 'var(--green)' : 'var(--red)';
+
+      elements.roi12Mo.textContent = mainRoi.toFixed(1) + 'x';
+      elements.roiPerDollar.textContent = '$' + mainRoi.toFixed(2);
+
+      // 6. Generate 12-Month Projection (only for performance mode)
+      if (!isPilot) {
+        generateProjection(periodEmailsSent, meetingsBooked, dealsClosed, dealSize, setupFee, billingFreq, retentionMonths, salesCycle, retainerAmount, upsellRate, upsellRetainerMonths);
+      }
+    }
+
+    function generateProjection(monthlyEmailsSent, monthlyMeetings, monthlyDeals, dealSize, setupFee, billingFreq, retentionMonths, salesCycle, retainerAmount, upsellRate, upsellRetainerMonths) {
+      const dealStartMonth = Math.ceil(salesCycle / 30);
+      let html = '';
+
+      let cumulativeEmails = 0;
+      let cumulativeBooked = 0;
+      let cumulativeClosed = 0;
+      let cumulativeRevenue = 0;
+
+      for (let m = 1; m <= 12; m++) {
+        cumulativeEmails += monthlyEmailsSent;
+        cumulativeBooked += monthlyMeetings;
+
+        const activityMonth = m - dealStartMonth + 1;
+        if (activityMonth >= 1) {
+          cumulativeClosed += monthlyDeals;
+        }
+
+        // Revenue calculation
+        let mRevenue = 0;
+        for (let c = 1; c <= m; c++) {
+          const cohortCloseMonth = c + dealStartMonth - 1;
+          if (m < cohortCloseMonth) continue;
+          const monthsSinceClose = m - cohortCloseMonth;
+          if (monthsSinceClose < retentionMonths || billingFreq === 'setup_upsell' && monthsSinceClose < upsellRetainerMonths) {
+            let isBillingMonth = false;
+            let paymentAmount = dealSize;
+            if (billingFreq === 'monthly') {
+              isBillingMonth = true;
+            } else if (billingFreq === 'quarterly') {
+              isBillingMonth = monthsSinceClose % 3 === 0;
+            } else if (billingFreq === 'yearly') {
+              isBillingMonth = monthsSinceClose % 12 === 0;
+            } else if (billingFreq === 'onetime') {
+              isBillingMonth = monthsSinceClose === 0;
+            } else if (billingFreq === 'setup_monthly') {
+              isBillingMonth = true;
+              if (monthsSinceClose === 0) {
+                paymentAmount = dealSize + setupFee;
+              }
+            } else if (billingFreq === 'setup_upsell') {
+              // All deals pay setup fee on month 0, then upsell % pay monthly retainer
+              if (monthsSinceClose === 0) {
+                paymentAmount = setupFee + ((upsellRate / 100) * retainerAmount);
+                isBillingMonth = true;
+              } else if (monthsSinceClose < upsellRetainerMonths) {
+                // Only upsell % continue paying retainer
+                paymentAmount = (upsellRate / 100) * retainerAmount;
+                isBillingMonth = true;
+              }
+            }
+            if (isBillingMonth) {
+              mRevenue += monthlyDeals * paymentAmount;
+            }
+          }
+        }
+        cumulativeRevenue += mRevenue;
+
+        html += `
+          <div class="projection-card">
+            <h3 class="projection-card-title">Month ${m}</h3>
+            <div class="projection-stat">
+              <span class="projection-stat-label">Total Emails</span>
+              <span class="projection-stat-value font-mono">${fmtNum(cumulativeEmails)}</span>
+            </div>
+            <div class="projection-stat">
+              <span class="projection-stat-label">Total Booked</span>
+              <span class="projection-stat-value font-mono">${fmtNum(cumulativeBooked)}</span>
+            </div>
+            <div class="projection-stat">
+              <span class="projection-stat-label">Total Closed</span>
+              <span class="projection-stat-value font-mono">${fmtNum(cumulativeClosed)}</span>
+            </div>
+            <div class="projection-separator"></div>
+            <div class="projection-stat">
+              <span class="projection-stat-label">Total Revenue</span>
+              <span class="projection-stat-value font-mono revenue">${fmtCurrency(cumulativeRevenue)}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      elements.projectionGrid.innerHTML = html;
+    }
+
+    // Event Listeners
+    function setupListeners() {
+      // Mode toggle buttons
+      elements.pilotModeBtn.addEventListener('click', () => {
+        currentMode = 'pilot';
+        updateModeUI();
+        calculate();
+      });
+
+      elements.performanceModeBtn.addEventListener('click', () => {
+        currentMode = 'performance';
+        updateModeUI();
+        calculate();
+      });
+
+      // All range inputs
+      const rangeInputs = ['emailsPerDay', 'customReplyRate', 'callBookingRate', 'showRate', 'closeRate'];
+      rangeInputs.forEach(id => {
+        elements[id].addEventListener('input', calculate);
+      });
+
+      // All checkboxes
+      const checkboxes = ['pmf', 'claims', 'guarantee', 'social', 'cases', 'magnet'];
+      checkboxes.forEach(id => {
+        elements[id].addEventListener('change', calculate);
+      });
+
+      // All selects
+      elements.replyRateType.addEventListener('change', () => {
+        elements.customReplyRateContainer.classList.toggle('visible', elements.replyRateType.value === 'custom');
+        calculate();
+      });
+
+      elements.billingFreq.addEventListener('change', () => {
+        const billingValue = elements.billingFreq.value;
+        const isSetupUpsell = billingValue === 'setup_upsell';
+        const isOnetime = billingValue === 'onetime';
+
+        // Show/hide appropriate billing fields
+        elements.upsellBillingFields.style.display = isSetupUpsell ? 'block' : 'none';
+        elements.standardBillingFields.style.display = isSetupUpsell ? 'none' : 'grid';
+        elements.retentionContainer.classList.toggle('hidden', isOnetime);
+
+        calculate();
+      });
+
+      elements.salesCycle.addEventListener('change', calculate);
+
+      // Number inputs
+      ['dealSize', 'setupFee', 'retentionMonths'].forEach(id => {
+        elements[id].addEventListener('input', calculate);
+      });
+
+      // Setup + Retainer Upsell inputs
+      ['retainerAmount', 'upsellRate', 'upsellRetainerMonths'].forEach(id => {
+        if (elements[id]) {
+          elements[id].addEventListener('input', calculate);
+        }
+      });
+
+      // Set current year
+      elements.currentYear.textContent = new Date().getFullYear();
+    }
+
+    // Initialize
+    setupListeners();
+    updateModeUI();
+    calculate();
+  </script>
+</body>
+</html>

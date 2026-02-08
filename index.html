@@ -830,11 +830,11 @@
     <header class="header">
       <div>
 <img src="logo.png" alt="Liquid Consulting" class="logo">
-        <h1 class="header-title" id="headerTitle">21-Day Pilot ROI Calculator</h1>
-        <p class="header-subtitle" id="headerSubtitle">Project your growth with Liquid Consulting's 21-Day Pilot</p>
+        <h1 class="header-title" id="headerTitle">60-Day Pilot ROI Calculator</h1>
+        <p class="header-subtitle" id="headerSubtitle">Project your growth with Liquid Consulting's 60-Day Pilot</p>
       </div>
       <div class="model-toggle">
-        <button class="model-toggle-btn active" id="pilotModeBtn" data-mode="pilot">21-Day Pilot</button>
+        <button class="model-toggle-btn active" id="pilotModeBtn" data-mode="pilot">60-Day Pilot</button>
         <button class="model-toggle-btn" id="performanceModeBtn" data-mode="performance">Retainer</button>
       </div>
     </header>
@@ -853,16 +853,26 @@
         </div>
         <div class="card-content">
 
-          <!-- Emails Per Day -->
+          <!-- Package Selection -->
           <div class="form-group">
             <div class="form-label">
-              <span>Emails Per Day</span>
-              <span class="form-value" id="emailsPerDayValue">2,000</span>
+              <span>Package</span>
+              <span class="form-value" id="packageDisplayName">Standard</span>
             </div>
-            <div class="slider-container">
+            <div class="select-wrapper">
+              <select id="packageType">
+                <option value="standard">Standard - 2,450 emails/day</option>
+                <option value="ultimate">Ultimate - 7,350 emails/day</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div id="customEmailsContainer" style="display: none; margin-top: 0.75rem;">
+              <div class="form-label">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Custom Emails/Day</span>
+                <span class="form-value" id="customEmailsValue" style="font-size: 0.75rem;">2,000</span>
+              </div>
               <input type="range" id="emailsPerDay" min="500" max="10000" step="100" value="2000">
             </div>
-            <p class="form-hint" id="emailsHint">*Calculated based on ~15 weekdays in 21-day pilot</p>
           </div>
 
           <div class="separator"></div>
@@ -953,14 +963,14 @@
             <svg class="icon"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="m2 10 20 0"/></svg>
             Projected Results
           </h2>
-          <p class="card-description" id="projectedResultsDesc">21-Day Pilot volume based on 15 weekdays</p>
+          <p class="card-description" id="projectedResultsDesc">60-Day Pilot volume based on 42 weekdays</p>
         </div>
         <div class="card-content">
 
           <!-- Top Metrics -->
           <div style="margin-bottom: 1rem;">
             <div class="metric-row">
-              <span class="metric-label" id="emailsSentLabel">Emails Sent (21 Days)</span>
+              <span class="metric-label" id="emailsSentLabel">Emails Sent (60 Days)</span>
               <span class="metric-value font-mono" id="monthlyEmailsSent">30,000</span>
             </div>
             <div class="metric-row">
@@ -968,11 +978,11 @@
               <span class="metric-value font-mono" id="peopleContacted">15,000</span>
             </div>
             <div class="metric-row">
-              <span class="metric-label" id="repliesLabel">Total Replies (21 Days)</span>
+              <span class="metric-label" id="repliesLabel">Total Replies (60 Days)</span>
               <span class="metric-value font-mono" id="totalMonthlyReplies">512</span>
             </div>
             <div class="metric-row highlight">
-              <span class="metric-label" id="interestedLabel">Interested Leads (21 Days)</span>
+              <span class="metric-label" id="interestedLabel">Interested Leads (60 Days)</span>
               <span class="metric-value font-mono" id="monthlyInterestedLeads">38</span>
             </div>
           </div>
@@ -1078,7 +1088,7 @@
               <div class="input-grid">
                 <div class="input-group">
                   <label>Setup Fee ($)</label>
-                  <input type="number" class="input-field" id="setupFee" value="3500">
+                  <input type="number" class="input-field" id="setupFee" value="5000">
                 </div>
                 <div class="input-group">
                   <label>Monthly Retainer ($)</label>
@@ -1152,12 +1162,12 @@
           <!-- ROI Metrics -->
           <div class="roi-grid" style="margin-bottom: 1rem;">
             <div class="roi-card">
-              <div class="roi-card-label" id="cashPeriodLabel">21-Day Cash</div>
+              <div class="roi-card-label" id="cashPeriodLabel">60-Day Cash</div>
               <div class="roi-card-value font-mono" id="cash30Day" style="color: var(--green);">$40,000</div>
               <div class="roi-card-hint" id="cash30DayHint">Based on cycle</div>
             </div>
             <div class="roi-card">
-              <div class="roi-card-label" id="roiPeriodLabel">21-Day ROI</div>
+              <div class="roi-card-label" id="roiPeriodLabel">60-Day ROI</div>
               <div class="roi-card-value font-mono" id="roi30DayX" style="color: var(--green);">7.27x</div>
               <div class="roi-card-hint">Initial Return</div>
             </div>
@@ -1166,14 +1176,14 @@
           <!-- Investment Display -->
           <div class="roi-card" style="margin-bottom: 1rem; background: rgba(var(--primary-rgb), 0.1); border-color: rgba(var(--primary-rgb), 0.2);">
             <div class="roi-card-label">Your Investment</div>
-            <div class="roi-card-value font-mono" id="investmentDisplay" style="color: var(--primary);">$3,500</div>
-            <div class="roi-card-hint" id="investmentHint">21-Day Pilot (one-time)</div>
+            <div class="roi-card-value font-mono" id="investmentDisplay" style="color: var(--primary);">$5,000</div>
+            <div class="roi-card-hint" id="investmentHint">60-Day Pilot (one-time)</div>
           </div>
 
           <!-- Main ROI Highlight -->
           <div class="roi-highlight">
             <div class="roi-highlight-header">
-              <span class="roi-highlight-title" id="mainRoiTitle">21-Day Pilot ROI</span>
+              <span class="roi-highlight-title" id="mainRoiTitle">60-Day Pilot ROI</span>
               <span class="roi-highlight-value" id="roi12Mo">7.3x</span>
             </div>
             <p class="roi-highlight-desc">
@@ -1217,7 +1227,11 @@
       headerSubtitle: document.getElementById('headerSubtitle'),
 
       // Inputs
+      packageType: document.getElementById('packageType'),
+      packageDisplayName: document.getElementById('packageDisplayName'),
       emailsPerDay: document.getElementById('emailsPerDay'),
+      customEmailsContainer: document.getElementById('customEmailsContainer'),
+      customEmailsValue: document.getElementById('customEmailsValue'),
       replyRateType: document.getElementById('replyRateType'),
       customReplyRate: document.getElementById('customReplyRate'),
       customReplyRateContainer: document.getElementById('customReplyRateContainer'),
@@ -1245,13 +1259,11 @@
       upsellRetainerMonths: document.getElementById('upsellRetainerMonths'),
 
       // Display Values
-      emailsPerDayValue: document.getElementById('emailsPerDayValue'),
       customReplyRateValue: document.getElementById('customReplyRateValue'),
       positiveRateBadge: document.getElementById('positiveRateBadge'),
       callBookingRateValue: document.getElementById('callBookingRateValue'),
       showRateValue: document.getElementById('showRateValue'),
       closeRateValue: document.getElementById('closeRateValue'),
-      emailsHint: document.getElementById('emailsHint'),
       projectedResultsDesc: document.getElementById('projectedResultsDesc'),
 
       // Dynamic Labels
@@ -1301,9 +1313,19 @@
 
     // Constants
     const WEEKDAYS_MONTH = 21;
-    const WEEKDAYS_PILOT = 15; // ~15 weekdays in 21 calendar days
-    const RETAINER_FEE = 5000; // $5,000/month flat retainer
-    const PILOT_FEE = 3500;
+    const WEEKDAYS_PILOT = 42; // ~42 weekdays in 60 calendar days
+
+    // Package configurations
+    const PACKAGES = {
+      pilot: {
+        ultimate: { price: 12500, emailsPerDay: 7350, label: 'Ultimate - 7,350 emails/day', displayName: 'Ultimate' },
+        standard: { price: 5000, emailsPerDay: 2450, label: 'Standard - 2,450 emails/day', displayName: 'Standard' }
+      },
+      retainer: {
+        ultimate: { price: 10000, emailsPerDay: 7500, label: 'Ultimate - 7,500 emails/day', displayName: 'Ultimate' },
+        standard: { price: 5000, emailsPerDay: 2500, label: 'Standard - 2,500 emails/day', displayName: 'Standard' }
+      }
+    };
 
     // Current mode
     let currentMode = 'pilot'; // 'pilot' or 'performance'
@@ -1317,31 +1339,37 @@
       elements.performanceModeBtn.classList.toggle('active', !isPilot);
 
       // Header
-      elements.headerTitle.textContent = isPilot ? '21-Day Pilot ROI Calculator' : 'Retainer ROI Calculator';
+      elements.headerTitle.textContent = isPilot ? '60-Day Pilot ROI Calculator' : 'Retainer ROI Calculator';
       elements.headerSubtitle.textContent = isPilot
-        ? "Project your growth with Liquid Consulting's 21-Day Pilot"
+        ? "Project your growth with Liquid Consulting's 60-Day Pilot"
         : "Project your growth with Liquid Consulting's Monthly Retainer";
 
       // Labels
-      const periodLabel = isPilot ? '21 Days' : 'Monthly';
+      const periodLabel = isPilot ? '60 Days' : 'Monthly';
       elements.emailsSentLabel.textContent = `Emails Sent (${periodLabel})`;
       elements.repliesLabel.textContent = `Total Replies (${periodLabel})`;
       elements.interestedLabel.textContent = `Interested Leads (${periodLabel})`;
-      elements.cashPeriodLabel.textContent = '30-Day Cash';
-      elements.roiPeriodLabel.textContent = '30-Day ROI';
+      elements.cashPeriodLabel.textContent = '60-Day Cash';
+      elements.roiPeriodLabel.textContent = '60-Day ROI';
       elements.mainRoiTitle.textContent = isPilot ? '90-Day ROI' : '12-Month ROI';
 
       // Hints
-      elements.emailsHint.textContent = isPilot
-        ? '*Calculated based on ~15 weekdays in 21-day pilot'
-        : '*Calculated based on ~21 weekdays/month';
       elements.projectedResultsDesc.textContent = isPilot
-        ? '21-Day Pilot volume based on 15 weekdays'
+        ? '60-Day Pilot volume based on 42 weekdays'
         : 'Monthly volume based on 21 weekdays';
 
-      // Investment display
-      elements.investmentDisplay.textContent = isPilot ? '$3,500' : '$5,000';
-      elements.investmentHint.textContent = isPilot ? '21-Day Pilot (one-time)' : 'Monthly Retainer';
+      // Update package dropdown options based on mode
+      const modeKey = isPilot ? 'pilot' : 'retainer';
+      const pkgs = PACKAGES[modeKey];
+      elements.packageType.innerHTML = `
+        <option value="standard">${pkgs.standard.label}</option>
+        <option value="ultimate">${pkgs.ultimate.label}</option>
+        <option value="custom">Custom</option>
+      `;
+      elements.customEmailsContainer.style.display = 'none';
+
+      // Investment display (will be updated by calculate())
+      elements.investmentHint.textContent = isPilot ? '60-Day Pilot (one-time)' : 'Monthly Retainer';
 
       // Show/hide sections
       elements.miniStatsSection.style.display = isPilot ? 'none' : 'grid';
@@ -1352,9 +1380,20 @@
     function calculate() {
       const isPilot = currentMode === 'pilot';
       const weekdays = isPilot ? WEEKDAYS_PILOT : WEEKDAYS_MONTH;
+      const modeKey = isPilot ? 'pilot' : 'retainer';
+      const packageKey = elements.packageType.value;
 
-      // 1. Get input values
-      const dailyEmails = parseInt(elements.emailsPerDay.value);
+      // 1. Get input values - use package or custom slider
+      let dailyEmails, periodCost;
+      if (packageKey === 'custom') {
+        dailyEmails = parseInt(elements.emailsPerDay.value);
+        // For custom, use standard pricing as base
+        periodCost = PACKAGES[modeKey].standard.price;
+      } else {
+        const pkg = PACKAGES[modeKey][packageKey];
+        dailyEmails = pkg.emailsPerDay;
+        periodCost = pkg.price;
+      }
       const periodEmailsSent = dailyEmails * weekdays;
 
       // Reply Rate
@@ -1416,11 +1455,11 @@
       }
 
       // Calculate costs and ROI based on mode
-      let periodCost, periodCash, periodRoi, periodRoiX, mainRoi;
+      let periodCash, periodRoi, periodRoiX, mainRoi;
 
       if (isPilot) {
-        // 21-Day Pilot: Fixed $3,500 cost
-        periodCost = PILOT_FEE;
+        // 60-Day Pilot: Cost based on package selection
+        // periodCost already set above from package
 
         // Cash in 30 days (standard metric)
         const dealsInPeriod = salesCycle <= 30 ? dealsClosed : 0;
@@ -1452,17 +1491,17 @@
           }
         }
 
-        // ROI for 21-day cash
+        // ROI for 60-day cash
         periodRoiX = periodCost > 0 ? (periodCash / periodCost).toFixed(2) : '0.00';
         // 90-Day ROI
         mainRoi = periodCost > 0 ? (value90Days / periodCost) : 0;
 
         elements.cash30DayHint.textContent = salesCycle > 30 ? '0 deals (Cycle > 30d)' : 'Based on cycle';
-        elements.investmentDisplay.textContent = fmtCurrency(PILOT_FEE);
+        elements.investmentDisplay.textContent = fmtCurrency(periodCost);
 
       } else {
-        // Retainer: $5,000/month flat fee
-        periodCost = RETAINER_FEE;
+        // Retainer: Cost based on package selection
+        // periodCost already set above from package
 
         // 30-day cash
         const dealsIn30Days = salesCycle <= 30 ? dealsClosed : 0;
@@ -1491,14 +1530,19 @@
         periodRoiX = periodCost > 0 ? (periodCash / periodCost).toFixed(2) : '0.00';
 
         elements.cash30DayHint.textContent = salesCycle > 30 ? '0 deals (Cycle > 30d)' : 'Based on cycle';
-        elements.investmentDisplay.textContent = fmtCurrency(RETAINER_FEE) + '/mo';
+        elements.investmentDisplay.textContent = fmtCurrency(periodCost) + '/mo';
       }
 
       const cac = dealsClosed > 0 ? Math.round(periodCost / dealsClosed) : 0;
       const ltvAdded = dealsClosed * calculatedLtv;
 
       // 5. Update UI
-      elements.emailsPerDayValue.textContent = fmtNum(dailyEmails);
+      // Update package display name
+      if (packageKey === 'custom') {
+        elements.packageDisplayName.textContent = 'Custom';
+      } else {
+        elements.packageDisplayName.textContent = PACKAGES[modeKey][packageKey].displayName;
+      }
       elements.customReplyRateValue.textContent = parseFloat(elements.customReplyRate.value).toFixed(1) + '%';
 
       elements.positiveRateBadge.textContent = positiveResponseRate + '% Positive Rate';
@@ -1640,10 +1684,23 @@
         calculate();
       });
 
+      // Package dropdown
+      elements.packageType.addEventListener('change', () => {
+        const isCustom = elements.packageType.value === 'custom';
+        elements.customEmailsContainer.style.display = isCustom ? 'block' : 'none';
+        calculate();
+      });
+
       // All range inputs
       const rangeInputs = ['emailsPerDay', 'customReplyRate', 'callBookingRate', 'showRate', 'closeRate'];
       rangeInputs.forEach(id => {
-        elements[id].addEventListener('input', calculate);
+        elements[id].addEventListener('input', () => {
+          // Update custom emails display if applicable
+          if (id === 'emailsPerDay') {
+            elements.customEmailsValue.textContent = fmtNum(elements.emailsPerDay.value);
+          }
+          calculate();
+        });
       });
 
       // All checkboxes

@@ -863,7 +863,7 @@
             <div class="select-wrapper">
               <select id="packageType">
                 <option value="standard">Standard - 2,450 emails/day</option>
-                <option value="ultimate">Ultimate - 7,350 emails/day</option>
+                <option value="ultimate">Ultimate - 5,000 emails/day</option>
                 <option value="custom">Custom</option>
               </select>
             </div>
@@ -883,18 +883,18 @@
             <label class="form-label">Reply Rate</label>
             <div class="select-wrapper">
               <select id="replyRateType">
-                <option value="avg">Our Client Average (3.41%)</option>
-                <option value="over">Overperforming (5.0%)</option>
-                <option value="under">Underperforming (1.2%)</option>
+                <option value="avg">Our Client Average (1.5%)</option>
+                <option value="over">Overperforming (2.1%)</option>
+                <option value="under">Underperforming (1.0%)</option>
                 <option value="custom">Custom Rate</option>
               </select>
             </div>
             <div id="customReplyRateContainer">
               <div class="form-label" style="margin-top: 0.75rem;">
                 <span style="font-size: 0.75rem; color: var(--text-muted);">Custom Rate</span>
-                <span class="form-value" id="customReplyRateValue" style="font-size: 0.75rem;">3.41%</span>
+                <span class="form-value" id="customReplyRateValue" style="font-size: 0.75rem;">1.5%</span>
               </div>
-              <input type="range" id="customReplyRate" min="0.1" max="10" step="0.1" value="3.41">
+              <input type="range" id="customReplyRate" min="0.1" max="10" step="0.1" value="1.5">
             </div>
           </div>
 
@@ -1319,12 +1319,12 @@
     // Package configurations
     const PACKAGES = {
       pilot: {
-        ultimate: { price: 12500, emailsPerDay: 7350, label: 'Ultimate - 7,350 emails/day', displayName: 'Ultimate' },
+        ultimate: { price: 12500, emailsPerDay: 5000, label: 'Ultimate - 5,000 emails/day', displayName: 'Ultimate' },
         standard: { price: 5000, emailsPerDay: 2450, label: 'Standard - 2,450 emails/day', displayName: 'Standard' }
       },
       retainer: {
         ultimate: { price: 10000, emailsPerDay: 7500, label: 'Ultimate - 7,500 emails/day', displayName: 'Ultimate' },
-        standard: { price: 5000, emailsPerDay: 2500, label: 'Standard - 2,500 emails/day', displayName: 'Standard' }
+        standard: { price: 5000, emailsPerDay: 2450, label: 'Standard - 2,450 emails/day', displayName: 'Standard' }
       }
     };
 
@@ -1398,10 +1398,10 @@
       const periodEmailsSent = dailyEmails * weekdays;
 
       // Reply Rate
-      let activeReplyRate = 3.41;
+      let activeReplyRate = 1.5;
       const replyRateType = elements.replyRateType.value;
-      if (replyRateType === 'over') activeReplyRate = 5.0;
-      else if (replyRateType === 'under') activeReplyRate = 1.2;
+      if (replyRateType === 'over') activeReplyRate = 2.1;
+      else if (replyRateType === 'under') activeReplyRate = 1.0;
       else if (replyRateType === 'custom') activeReplyRate = parseFloat(elements.customReplyRate.value);
 
       // Positive Response Rate

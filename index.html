@@ -862,8 +862,9 @@
             </div>
             <div class="select-wrapper">
               <select id="packageType">
-                <option value="standard">Standard - 2,450 emails/day</option>
-                <option value="ultimate">Ultimate - 5,000 emails/day</option>
+                <option value="minimum">Minimum - 2,500 emails/day</option>
+                <option value="standard">Standard - 5,000 emails/day</option>
+                <option value="elite">Elite - 8,500 emails/day</option>
                 <option value="custom">Custom</option>
               </select>
             </div>
@@ -1319,12 +1320,14 @@
     // Package configurations
     const PACKAGES = {
       pilot: {
-        ultimate: { price: 12500, emailsPerDay: 5000, label: 'Ultimate - 5,000 emails/day', displayName: 'Ultimate' },
-        standard: { price: 5000, emailsPerDay: 2450, label: 'Standard - 2,450 emails/day', displayName: 'Standard' }
+        minimum: { price: 5000, emailsPerDay: 2500, label: 'Minimum - 2,500 emails/day', displayName: 'Minimum' },
+        standard: { price: 12500, emailsPerDay: 5000, label: 'Standard - 5,000 emails/day', displayName: 'Standard' },
+        elite: { price: 30000, emailsPerDay: 8500, label: 'Elite - 8,500 emails/day', displayName: 'Elite' }
       },
       retainer: {
-        ultimate: { price: 10000, emailsPerDay: 7500, label: 'Ultimate - 7,500 emails/day', displayName: 'Ultimate' },
-        standard: { price: 5000, emailsPerDay: 2450, label: 'Standard - 2,450 emails/day', displayName: 'Standard' }
+        minimum: { price: 5000, emailsPerDay: 2500, label: 'Minimum - 2,500 emails/day', displayName: 'Minimum' },
+        standard: { price: 10000, emailsPerDay: 5000, label: 'Standard - 5,000 emails/day', displayName: 'Standard' },
+        elite: { price: 15000, emailsPerDay: 8500, label: 'Elite - 8,500 emails/day', displayName: 'Elite' }
       }
     };
 
@@ -1363,8 +1366,9 @@
       const modeKey = isPilot ? 'pilot' : 'retainer';
       const pkgs = PACKAGES[modeKey];
       elements.packageType.innerHTML = `
+        <option value="minimum">${pkgs.minimum.label}</option>
         <option value="standard">${pkgs.standard.label}</option>
-        <option value="ultimate">${pkgs.ultimate.label}</option>
+        <option value="elite">${pkgs.elite.label}</option>
         <option value="custom">Custom</option>
       `;
       elements.customEmailsContainer.style.display = 'none';
